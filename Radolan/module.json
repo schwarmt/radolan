@@ -1,0 +1,16 @@
+{
+    "id": "{AD7D2A05-15A3-D7BA-EA81-188DFA4B6C7C}",
+    "name": "Radolan",
+    "type": 3,
+    "vendor": "",
+    "aliases": [],
+    "parentRequirements": [
+        "{D4C1D08F-CD3B-494B-BE18-B36EF73B8F43}"
+    ],
+    "childRequirements": [],
+    "implemented": [
+        "{018EF6B5-AB94-40C6-AA53-46943E824ACF}"
+    ],
+    "prefix": "RAD",
+    "url": ""
+}
