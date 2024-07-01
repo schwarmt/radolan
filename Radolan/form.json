@@ -8,6 +8,12 @@
             "onClick": "RAD_GetRadolanData($id);"
         },
         {
+            "name": "ProcessMethod",
+            "type": "Button",
+            "caption": "Process Radolan Data",
+            "onClick": "RAD_ProcessRadolanData($id);"
+        },
+        {
             "name": "RequestURL",
             "type": "ValidationTextBox",
             "caption": "Request URL"
