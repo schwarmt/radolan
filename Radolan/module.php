@@ -437,7 +437,7 @@ class Radolan extends IPSModule
         foreach($colMappingBackground as $limit => $col){
             imagefilledrectangle($imBackground, $lx, $ly+$i*$lh, $lx+$lw, $ly+$i*$lh+$lh, $col);
             imagerectangle($imBackground, $lx, $ly+$i*$lh, $lx+$lw, $ly+$i*$lh+$lh, $black);
-            $limitString=number_format($limit, 1,".",null);
+            $limitString=number_format((float)$limit, 1,".",null);
             if($limit<10){
                 $limitString=" ".$limitString;
             }
