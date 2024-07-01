@@ -28,6 +28,17 @@ declare(strict_types=1);
 			$this->SendDataToParent(json_encode(['DataID' => '{D4C1D08F-CD3B-494B-BE18-B36EF73B8F43}', "RequestMethod" => $RequestMethod, "RequestURL" => $RequestURL, "RequestData" => $RequestData, "Timeout" => $Timeout]));
 		}
 
+        function delFolderContents($dir){
+            $files = array_diff(scandir($dir), array('.', '..'));
+            foreach ($files as $file) {
+                (is_dir("$dir/$file")) ? delTree("$dir/$file") : unlink("$dir/$file");
+            }
+        }
+        function delTree($dir): bool {
+            delFolderContents($dir);
+            return rmdir($dir);
+        }
+
 		public function ReceiveData($JSONString)
 		{
 			$data = json_decode($JSONString);
