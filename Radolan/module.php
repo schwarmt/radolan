@@ -31,11 +31,11 @@ declare(strict_types=1);
         function delFolderContents($dir){
             $files = array_diff(scandir($dir), array('.', '..'));
             foreach ($files as $file) {
-                (is_dir("$dir/$file")) ? delTree("$dir/$file") : unlink("$dir/$file");
+                (is_dir("$dir/$file")) ? $this->delTree("$dir/$file") : unlink("$dir/$file");
             }
         }
         function delTree($dir): bool {
-            delFolderContents($dir);
+            $this->delFolderContents($dir);
             return rmdir($dir);
         }
 
@@ -107,7 +107,7 @@ declare(strict_types=1);
                 mkdir($WNdataDir);
             }
             else{
-                delFolderContents($WNdataDir);
+                $this->delFolderContents($WNdataDir);
             }
 
             $outDir=$localTempRadolanFolder.DIRECTORY_SEPARATOR."out".DIRECTORY_SEPARATOR;
@@ -115,7 +115,7 @@ declare(strict_types=1);
                 mkdir($outDir);
             }
             else{
-                delFolderContents($outDir);
+                $this->delFolderContents($outDir);
             }
 
             $full_file_name = $localTempRadolanFolder.DIRECTORY_SEPARATOR.$file_name;
