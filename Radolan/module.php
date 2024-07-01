@@ -119,18 +119,22 @@ declare(strict_types=1);
             }
 
             $full_file_name = $localTempRadolanFolder.DIRECTORY_SEPARATOR.$file_name;
+            $full_file_name_bz2 = $localTempRadolanFolder.DIRECTORY_SEPARATOR.$file_name."bz2";
 
             $localImage = IPS_GetKernelDir()."\\media\\bild.jpg";
+
+            file_put_contents( $full_file_name_bz2, file_get_contents($url));
+            exec("bzip2 $full_file_name_bz2");
 
             // Use file_get_contents() function to get the file
             // from url and use file_put_contents() function to
             // save the file by using base name
-            if(file_put_contents( $full_file_name,bzdecompress ( file_get_contents($url), true ))) {
-                echo "File downloaded successfully";
-            }
-            else {
-                echo "File downloading failed.";
-            }
+            #if(file_put_contents( $full_file_name,bzdecompress ( file_get_contents($url), true ))) {
+            #    echo "File downloaded successfully";
+            #}
+            #else {
+            #    echo "File downloading failed.";
+            #}
             try {
                 $phar = new PharData($full_file_name);
                 $phar->extractTo($WNdataDir, null, true); // extract all files
