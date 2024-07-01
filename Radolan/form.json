@@ -3,8 +3,9 @@
     "actions": [
         {
             "name": "RequestMethod",
-            "type": "ValidationTextBox",
-            "caption": "Reques Method"
+            "type": "Button",
+            "caption": "Get Radolan Data",
+            "onClick": "RAD_GetRadolanData($id);"
         },
         {
             "name": "RequestURL",
