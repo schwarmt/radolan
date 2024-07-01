@@ -82,7 +82,7 @@ declare(strict_types=1);
             return $MediaId;
         }
 
-        public function GetRadolanData($id){
+        public function GetRadolanData(){
 
             $url = 'https://opendata.dwd.de/weather/radar/composite/wn/WN_LATEST.tar.bz2';
             $file_name = 'WN_LATEST.tar';
