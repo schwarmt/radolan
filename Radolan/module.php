@@ -81,7 +81,7 @@ class RadolanComposite {
         $lamda = atan(-$x / $y) + $this->lamda0;
         $term = $this->square($this->earthRadius) * $this->square(1 + sin($this->phi0));
         $phi = asin(($term -($this->square($x) + $this->square($y))) / ($term + ($this->square($x) + $this->square($y))));
-        return [rad2deg($phi), rad2deg($lamda)];
+        return [(int)rad2deg($phi), (int)rad2deg($lamda)];
     }
 
     // x, y := c.Translate(52.51861, 13.40833)	// Berlin (lat, lon)
@@ -105,7 +105,7 @@ class RadolanComposite {
         // scaling
         $x /= $this->Rx;
         $y /= $this->Ry;
-        return [$x, $y];
+        return [(int)round($x), (int)round($y)];
     }
 
 }
