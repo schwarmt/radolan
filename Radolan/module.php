@@ -121,7 +121,7 @@ declare(strict_types=1);
                 $this->delFolderContents($outDir);
             }
 
-            $full_file_name = $localTempRadolanFolder.DIRECTORY_SEPARATOR.$file_name.".out";
+            $full_file_name = $localTempRadolanFolder.DIRECTORY_SEPARATOR.$file_name;
             $full_file_name_bz2 = $localTempRadolanFolder.DIRECTORY_SEPARATOR.$file_name.".bz2";
             $localImage = IPS_GetKernelDir()."\\media\\bild.jpg";
 
