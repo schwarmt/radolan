@@ -151,6 +151,7 @@ class Radolan extends IPSModule
 
         $this->RegisterAttributeString("WNDataDirectory", "");
         $this->RegisterAttributeString("ImageOutDirectory", "");
+        $this->RegisterAttributeString("colMappingBackground", "");
 
 
         $this->RegisterAttributeInteger("predictionLeftSquareX", 0);
@@ -438,6 +439,8 @@ class Radolan extends IPSModule
         $this->WriteAttributeInteger("measureRightSquareX", $measureRightSquareX);
         $this->WriteAttributeInteger("measureTopSquareY", $measureTopSquareY);
         $this->WriteAttributeInteger("measureBottomSquareY", $measureBottomSquareY);
+        $this->WriteAttributeString("colMappingBackground", implode(',', $colMappingBackground));
+        $this->WriteAttributeString("relPixel", implode(',', $relPixel));
     }
 
     public function ProcessRadolanData(){
@@ -455,9 +458,11 @@ class Radolan extends IPSModule
         $measureRightSquareX= $this->ReadAttributeInteger("measureRightSquareX");
         $measureTopSquareY= $this->ReadAttributeInteger("measureTopSquareY");
         $measureBottomSquareY= $this->ReadAttributeInteger("measureBottomSquareY");
+        $measureRadius = $this->ReadPropertyInteger("Radius");
 
-        $relPixel = 0;
-        $measureRadius = 0;
+
+        $colMappingBackground = explode(',',$this->ReadAttributeString("colMappingBackground"));
+        $relPixel = explode(',',$this->ReadAttributeString("relPixel"));
 
         $imMerge= $this->createEmptyImage();
         $colMapping= $this->addColorsToImage($imMerge, self::COLORS);
