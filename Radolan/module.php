@@ -119,7 +119,10 @@ class Radolan extends IPSModule
         //Never delete this line!
         parent::Create();
 
-        $this->RequireParent('{4CB91589-CE01-4700-906F-26320EFCF6C4}');
+        $this->RegisterPropertyFloat("Latitude", 48.762778);
+        $this->RegisterPropertyFloat("Longitude", 11.424722);
+        $this->RegisterPropertyInteger("Radius", 8);
+        $this->RegisterPropertyString("Place", "Ingolstadt");
 
         $this->RegisterAttributeString("WNDataDirectory", "");
         $this->RegisterAttributeString("ImageOutDirectory", "");
