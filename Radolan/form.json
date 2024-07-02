@@ -15,6 +15,12 @@
             "onClick": "RAD_GetRadolanData($id);"
         },
         {
+            "name": "RequestMethod",
+            "type": "Button",
+            "caption": "Create Background Image",
+            "onClick": "RAD_CreateBackgroundImage($id);"
+        },
+        {
             "name": "ProcessMethod",
             "type": "Button",
             "caption": "Process Radolan Data",

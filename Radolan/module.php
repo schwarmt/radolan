@@ -114,6 +114,31 @@ class RadolanComposite {
 
 class Radolan extends IPSModule
 {
+
+    const COLORS = [
+            "85"  => ["r" => 255, "g" =>  50, "b" => 255],
+            "75"  => ["r" => 153, "g" =>   0, "b" => 153],
+            "65"  => ["r" =>   1, "g" =>   0, "b" => 202],
+            "60"  => ["r" =>  72, "g" =>  72, "b" => 255],
+            "55"  => ["r" => 180, "g" =>   1, "b" =>   1],
+            "50.5"=> ["r" => 255, "g" =>   2, "b" =>   0],
+            "46"  => ["r" => 254, "g" => 137, "b" =>   2],
+            "41.5"=> ["r" => 255, "g" => 196, "b" =>   2],
+            "37"  => ["r" => 255, "g" => 255, "b" =>   0],
+            "32.5"=> ["r" => 204, "g" => 230, "b" =>   2],
+            "28"  => ["r" => 154, "g" => 204, "b" =>   2],
+            "23.5"=> ["r" =>  77, "g" => 191, "b" =>  25],
+            "19"  => ["r" =>   0, "g" => 153, "b" =>  52],
+            "14.5"=> ["r" =>   0, "g" => 202, "b" => 202],
+            "10"  => ["r" =>  52, "g" => 255, "b" => 255],
+            "5.5" => ["r" => 153, "g" => 255, "b" => 255],
+            "1"   => ["r" => 227, "g" => 255, "b" => 255],
+            "0"   => ["r" => 255, "g" => 255, "b" => 255]];
+
+    const LEGENDE_X=80;
+    const LEGENDE_Y=100;
+    const LEGENDE_WIDTH=80;
+    const LEGENDE_HEIGHT=50;
     public function Create()
     {
         //Never delete this line!
@@ -126,6 +151,13 @@ class Radolan extends IPSModule
 
         $this->RegisterAttributeString("WNDataDirectory", "");
         $this->RegisterAttributeString("ImageOutDirectory", "");
+
+
+        $this->RegisterAttributeInteger("predictionLeftSquareX", 0);
+        $this->RegisterAttributeInteger("predictionRightSquareX", 0);
+        $this->RegisterAttributeInteger("predictionTopSquareY", 0);
+        $this->RegisterAttributeInteger("predictionBottomSquareY", 0);
+
     }
 
     public function Destroy()
@@ -138,11 +170,6 @@ class Radolan extends IPSModule
     {
         //Never delete this line!
         parent::ApplyChanges();
-    }
-
-    public function Send(string $RequestMethod, string $RequestURL, string $RequestData, int $Timeout)
-    {
-        $this->SendDataToParent(json_encode(['DataID' => '{D4C1D08F-CD3B-494B-BE18-B36EF73B8F43}', "RequestMethod" => $RequestMethod, "RequestURL" => $RequestURL, "RequestData" => $RequestData, "Timeout" => $Timeout]));
     }
 
     function createEmptyImage(){
@@ -169,54 +196,23 @@ class Radolan extends IPSModule
         return rmdir($dir);
     }
 
-    public function ReceiveData($JSONString)
-    {
-        $data = json_decode($JSONString);
-        IPS_LogMessage('Device RECV', utf8_decode($data->Buffer . ' - ' . $data->RequestMethod . ' - ' . $data->RequestURL . ' - ' . $data->RequestData . ' - ' . $data->Timeout));
-    }
-
     public function UpdateImage()
     {
-        $URL = $this->ImageURL;
-        if ($URL == false) {
-            return false;
-        }
-        if ($this->ParentID == 0) {
-            return false;
-        }
-        if (!$this->HasActiveParent()) {
-            return false;
-        }
-        $ch = curl_init();
-        curl_setopt($ch, CURLOPT_URL, $URL);
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-        curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 2);
-        curl_setopt($ch, CURLOPT_TIMEOUT_MS, 5000);
-        curl_setopt($ch, CURLOPT_HTTPAUTH, CURLAUTH_BASIC | CURLAUTH_DIGEST);
-        $this->SendDebug('Request Image', $URL, 0);
-        $Result = curl_exec($ch);
-        $http_code = curl_getinfo($ch, CURLINFO_RESPONSE_CODE);
-        $Error = curl_error($ch);
-        curl_close($ch);
-        if (($Result === false) || ($http_code >= 400)) {
-            $this->SendDebug('Request Image ' . $http_code, $Error, 0);
-            set_error_handler([$this, 'ModulErrorHandler']);
-            trigger_error($Error, E_USER_NOTICE);
-            restore_error_handler();
-            return false;
-        }
+        $filename = 'media' . DIRECTORY_SEPARATOR . 'ONVIF_' . $this->InstanceID . '.jpg';
+        IPS_SetMediaFile($MediaId, $filename, false);
+
         $MediaId = $this->GetMediaId();
         IPS_SetMediaContent($MediaId, base64_encode($Result));
         return true;
     }
-    protected function GetMediaId()
+    protected function GetMediaId($name)
     {
-        $MediaId = @$this->GetIDForIdent('IMAGE');
+        $MediaId = @$this->GetIDForIdent('RAD_'.$name);
         if ($MediaId == false) {
             $MediaId = IPS_CreateMedia(MEDIATYPE_IMAGE);
             IPS_SetParent($MediaId, $this->InstanceID);
             IPS_SetName($MediaId, $this->Translate('Image'));
-            IPS_SetIdent($MediaId, 'IMAGE');
+            IPS_SetIdent($MediaId, 'RAD_'.$name);
             $filename = 'media' . DIRECTORY_SEPARATOR . 'ONVIF_' . $this->InstanceID . '.jpg';
             IPS_SetMediaFile($MediaId, $filename, false);
         }
@@ -281,37 +277,17 @@ class Radolan extends IPSModule
 
 
     }
-    public function ProcessRadolanData(){
+
+    public function CreateBackgroundImage(){
 
         include 'Borders.php';
         include 'Cities.php';
 
-        $colors= array(
-            "85"  => array ("r" => 255, "g" =>  50, "b" => 255),
-            "75"  => array ("r" => 153, "g" =>   0, "b" => 153),
-            "65"  => array ("r" =>   1, "g" =>   0, "b" => 202),
-            "60"  => array ("r" =>  72, "g" =>  72, "b" => 255),
-            "55"  => array ("r" => 180, "g" =>   1, "b" =>   1),
-            "50.5" => array ("r" => 255, "g" =>   2, "b" =>   0),
-            "46"  => array ("r" => 254, "g" => 137, "b" =>   2),
-            "41.5"=> array ("r" => 255, "g" => 196, "b" =>   2),
-            "37"  => array ("r" => 255, "g" => 255, "b" =>   0),
-            "32.5"=> array ("r" => 204, "g" => 230, "b" =>   2),
-            "28"  => array ("r" => 154, "g" => 204, "b" =>   2),
-            "23.5"=> array ("r" =>  77, "g" => 191, "b" =>  25),
-            "19"  => array ("r" =>   0, "g" => 153, "b" =>  52),
-            "14.5"=> array ("r" =>   0, "g" => 202, "b" => 202),
-            "10"  => array ("r" =>  52, "g" => 255, "b" => 255),
-            "5.5"=> array ("r" => 153, "g" => 255, "b" => 255),
-            "1"  => array ("r" => 227, "g" => 255, "b" => 255),
-            "0"  => array ("r" => 255, "g" => 255, "b" => 255));
+        $measureLat = $this->ReadPropertyFloat("Latitude");
+        $measureLon = $this->ReadPropertyFloat("Longitude");
+        $measureRadius = $this->ReadPropertyInteger("Radius");
+        $measureName = $this->ReadPropertyString("Place");
 
-        $measureLat = 48.762778;
-        $measureLon = 11.424722;
-        //    $measureLat = 52.0;
-        //    $measureLon = 9.524722;
-        $measureName = "Ingolstadt";
-        $measureRadius = 8;
         $predictionLength = 300;
 
         date_default_timezone_set ('Europe/Berlin' );
@@ -339,7 +315,7 @@ class Radolan extends IPSModule
         print "Ingolstadt again: Lat: $xx Lon: $yy\n";
 
         $imBackground= $this->createEmptyImage();
-        $colMappingBackground= $this->addColorsToImage($imBackground, $colors);
+        $colMappingBackground= $this->addColorsToImage($imBackground, self::COLORS);
         $black = imagecolorallocate($imBackground, 0, 0, 0);
         $transparent = imagecolorallocate($imBackground, 1, 1, 1);
         imagecolortransparent ( $imBackground, $transparent ) ;
@@ -432,19 +408,16 @@ class Radolan extends IPSModule
         $i=0;
         $fromString = "  >";
         $toString = "";
-        $lx=80;
-        $ly=100;
-        $lw=80;
-        $lh=50;
+
 
         foreach($colMappingBackground as $limit => $col){
-            imagefilledrectangle($imBackground, $lx, $ly+$i*$lh, $lx+$lw, $ly+$i*$lh+$lh, $col);
-            imagerectangle($imBackground, $lx, $ly+$i*$lh, $lx+$lw, $ly+$i*$lh+$lh, $black);
+            imagefilledrectangle($imBackground, self::LEGENDE_X, self::LEGENDE_Y+$i*self::LEGENDE_HEIGHT, self::LEGENDE_X+self::LEGENDE_WIDTH, self::LEGENDE_Y+$i*self::LEGENDE_HEIGHT+self::LEGENDE_HEIGHT, $col);
+            imagerectangle($imBackground, self::LEGENDE_X, self::LEGENDE_Y+$i*self::LEGENDE_HEIGHT, self::LEGENDE_X+self::LEGENDE_WIDTH, self::LEGENDE_Y+$i*self::LEGENDE_HEIGHT+self::LEGENDE_HEIGHT, $black);
             $limitString=number_format((float)$limit, 1,".",null);
             if($limit<10){
                 $limitString=" ".$limitString;
             }
-            imagestring($imBackground, 3, $lx+10 , $ly+$i*$lh+15, $fromString.$limitString.$toString, $black);
+            imagestring($imBackground, 3, self::LEGENDE_X+10 , self::LEGENDE_Y+$i*self::LEGENDE_HEIGHT+15, $fromString.$limitString.$toString, $black);
             $toString = "-$limitString";
             $fromString = "";
             $i++;
@@ -453,8 +426,41 @@ class Radolan extends IPSModule
         imagestring($imBackground, 5, 480, 1150,"Quelle: Deutscher Wetterdienst / OpenStreetMap", $black);
 
 
+        $outDir=$this->ReadAttributeString("ImageOutDirectory");
+        $backgroundImageFile=$outDir."background.png";
+        imagepng($imBackground, $backgroundImageFile);
+
+        $this->WriteAttributeInteger("predictionLeftSquareX", $predictionLeftSquareX);
+        $this->WriteAttributeInteger("predictionRightSquareX", $predictionRightSquareX);
+        $this->WriteAttributeInteger("predictionTopSquareY", $predictionTopSquareY);
+        $this->WriteAttributeInteger("predictionBottomSquareY", $predictionBottomSquareY);
+        $this->WriteAttributeInteger("measureLeftSquareX", $measureLeftSquareX);
+        $this->WriteAttributeInteger("measureRightSquareX", $measureRightSquareX);
+        $this->WriteAttributeInteger("measureTopSquareY", $measureTopSquareY);
+        $this->WriteAttributeInteger("measureBottomSquareY", $measureBottomSquareY);
+    }
+
+    public function ProcessRadolanData(){
+
+        $outDir=$this->ReadAttributeString("ImageOutDirectory");
+        $backgroundImageFile=$outDir."background.png";
+        $imBackground = @imagecreatefrompng($backgroundImageFile);
+
+        $predictionLeftSquareX  = $this->ReadAttributeInteger("predictionLeftSquareX");
+        $predictionTopSquareY   = $this->ReadAttributeInteger("predictionTopSquareY");
+        $predictionRightSquareX = $this->ReadAttributeInteger("predictionRightSquareX");
+        $predictionBottomSquareY= $this->ReadAttributeInteger("predictionBottomSquareY");
+
+        $measureLeftSquareX= $this->ReadAttributeInteger("measureLeftSquareX");
+        $measureRightSquareX= $this->ReadAttributeInteger("measureRightSquareX");
+        $measureTopSquareY= $this->ReadAttributeInteger("measureTopSquareY");
+        $measureBottomSquareY= $this->ReadAttributeInteger("measureBottomSquareY");
+
+        $relPixel = 0;
+        $measureRadius = 0;
+
         $imMerge= $this->createEmptyImage();
-        $colMapping= $this->addColorsToImage($imMerge, $colors);
+        $colMapping= $this->addColorsToImage($imMerge, self::COLORS);
 
         $first=true;
 
@@ -464,7 +470,7 @@ class Radolan extends IPSModule
             if($filename != "." && $filename != "..") {
 
                 $im= $this->createEmptyImage();
-                $colMapping= $this->addColorsToImage($im, $colors);
+                $colMapping= $this->addColorsToImage($im, self::COLORS);
                 $black = imagecolorallocate($im, 0, 0, 0);
                 $white = imagecolorallocate($im, 255, 255, 255);
                 $pink = imagecolorallocate($im, 255, 50, 255);
@@ -538,7 +544,7 @@ class Radolan extends IPSModule
                         $y = $predictionBottomSquareY;
                     }
                 }
-                while(!feof($handle) && ($first || ($y > $predictionTopSquareY))) {
+                while(!feof($handle) && ($first || ($y > $this->ReadAttributeInteger("predictionTopSquareY")))) {
                     // erstes Bild oder unterhalb des Vorhersagebereichs
                     if (!$first) {
                         if ($x == 0 && $predictionLeftSquareX > 0) {
@@ -626,13 +632,13 @@ class Radolan extends IPSModule
                 }
                 // aktueller Wert
                 $i=sizeof($colMappingBackground);
-                imagefilledrectangle($im, $lx, $ly+$i*$lh, $lx+$lw, $ly+$i*$lh+$lh, $color);
-                imagerectangle($im, $lx, $ly+$i*$lh, $lx+$lw, $ly+$i*$lh+$lh, $black);
+                imagefilledrectangle($im, self::LEGENDE_X, self::LEGENDE_Y+$i*self::LEGENDE_HEIGHT, self::LEGENDE_X+self::LEGENDE_WIDTH, self::LEGENDE_Y+$i*self::LEGENDE_HEIGHT+self::LEGENDE_HEIGHT, $color);
+                imagerectangle($im, self::LEGENDE_X, self::LEGENDE_Y+$i*self::LEGENDE_HEIGHT, self::LEGENDE_X+self::LEGENDE_WIDTH, self::LEGENDE_Y+$i*self::LEGENDE_HEIGHT+self::LEGENDE_HEIGHT, $black);
                 $avgdBZString=number_format($avgdBZ, 1,".",null);
                 if($avgdBZ<10){
                     $avgdBZString=" ".$avgdBZString;
                 }
-                imagestring($im, 3, $lx+10 , $ly+$i*$lh+10, "dBZ: $avgdBZString", $black);
+                imagestring($im, 3, self::LEGENDE_X+10 , self::LEGENDE_Y+$i*self::LEGENDE_HEIGHT+10, "dBZ: $avgdBZString", $black);
                 imagecopymerge($im, $imBackground, 0, 0, 0, 0, 1100, 1200, 100);
                 $imout= imagecrop($im, ['x' => 80, 'y' => 80, 'width' => 950, 'height' => 1100]);
 
