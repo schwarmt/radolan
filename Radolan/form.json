@@ -9,19 +9,19 @@
     ],
     "actions": [
         {
-            "name": "RequestMethod",
+            "name": "GetRadolanData",
             "type": "Button",
             "caption": "Get Radolan Data",
             "onClick": "RAD_GetRadolanData($id);"
         },
         {
-            "name": "RequestMethod",
+            "name": "CreateBackgroundImage",
             "type": "Button",
             "caption": "Create Background Image",
             "onClick": "RAD_CreateBackgroundImage($id);"
         },
         {
-            "name": "ProcessMethod",
+            "name": "ProcessRadolanData",
             "type": "Button",
             "caption": "Process Radolan Data",
             "onClick": "RAD_ProcessRadolanData($id);"
