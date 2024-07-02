@@ -267,8 +267,7 @@ class Radolan extends IPSModule
             // handle errors
         }
         // tar-file löschen
-
-
+        unlink($full_file_name);
     }
     public function ProcessRadolanData(){
 
