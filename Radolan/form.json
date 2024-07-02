@@ -1,5 +1,12 @@
 {
-    "elements": [],
+    "elements": [
+        { "type": "NumberSpinner", "name": "Latitude", "caption": "Latitude (N)", "digits": 2},
+
+        { "type": "ValidationTextBox", "name": "IP", "caption": "IP" },
+        { "type": "Label", "label": "Update interval" },
+        { "type": "IntervalBox", "name": "Period", "caption": "Seconds" }
+
+    ],
     "actions": [
         {
             "name": "RequestMethod",
@@ -14,12 +21,22 @@
             "onClick": "RAD_ProcessRadolanData($id);"
         },
         {
-            "name": "RequestURL",
+            "name": "Latitude (e.g. 48.762778)",
             "type": "ValidationTextBox",
-            "caption": "Request URL"
+            "caption": "geographical lat"
         },
         {
-            "name": "RequestData",
+            "name": "Longitude (e.g. 11.424722)",
+            "type": "ValidationTextBox",
+            "caption": "geographical lon"
+        },
+        {
+            "name": "Place (e.g. Ingolstadt)",
+            "type": "ValidationTextBox",
+            "caption": "Request Data"
+        },
+        {
+            "name": "Radius (e.g. 8)",
             "type": "ValidationTextBox",
             "caption": "Request Data"
         },
@@ -28,11 +45,7 @@
             "type": "NumberSpinner",
             "caption": "Timeout"
         },
-        {
-            "type": "Button",
-            "caption": "Send",
-            "onClick": "RAD_Send($id, $RequestMethod, $RequestURL, $RequestData, $Timeout);"
-        }
+
     ],
     "status": []
 }

@@ -450,199 +450,198 @@ class Radolan extends IPSModule
         imagestring($imBackground, 5, 480, 1150,"Quelle: Deutscher Wetterdienst / OpenStreetMap", $black);
 
 
-                $imMerge= $this->createEmptyImage();
-                $colMapping= $this->addColorsToImage($imMerge, $colors);
+        $imMerge= $this->createEmptyImage();
+        $colMapping= $this->addColorsToImage($imMerge, $colors);
 
-                $first=true;
+        $first=true;
 
-                $WNdataDir=$this->ReadAttributeString("WNDataDirectory");
+        $WNdataDir=$this->ReadAttributeString("WNDataDirectory");
 
-                foreach(scandir ( $WNdataDir , SCANDIR_SORT_ASCENDING ) as $filename) {
-                    if($filename != "." && $filename != "..") {
+        foreach(scandir ( $WNdataDir , SCANDIR_SORT_ASCENDING ) as $filename) {
+            if($filename != "." && $filename != "..") {
 
-                        $im= $this->createEmptyImage();
-                        $colMapping= $this->addColorsToImage($im, $colors);
-                        $black = imagecolorallocate($im, 0, 0, 0);
-                        $white = imagecolorallocate($im, 255, 255, 255);
-                        $pink = imagecolorallocate($im, 255, 50, 255);
-                        $transparent = imagecolorallocate($im, 1, 1, 1);
-                        imagecolortransparent ( $im, $transparent ) ;
-                        if($first){
-                            imagefill (  $im , 0 , 0 , $white);
-                        }
-                        else{
-                            imagecopymerge($im, $imMerge, 0, 0, 0, 0, 1100, 1200, 50);
-                            imagefilledrectangle($im, $predictionLeftSquareX, $predictionTopSquareY, $predictionRightSquareX, $predictionBottomSquareY, $white);
-                        }
-                        echo "Datei: $filename";
-                        $handle = fopen($WNdataDir.$filename, "rb");
+                $im= $this->createEmptyImage();
+                $colMapping= $this->addColorsToImage($im, $colors);
+                $black = imagecolorallocate($im, 0, 0, 0);
+                $white = imagecolorallocate($im, 255, 255, 255);
+                $pink = imagecolorallocate($im, 255, 50, 255);
+                $transparent = imagecolorallocate($im, 1, 1, 1);
+                imagecolortransparent ( $im, $transparent ) ;
+                if($first){
+                    imagefill (  $im , 0 , 0 , $white);
+                }
+                else{
+                    imagecopymerge($im, $imMerge, 0, 0, 0, 0, 1100, 1200, 50);
+                    imagefilledrectangle($im, $predictionLeftSquareX, $predictionTopSquareY, $predictionRightSquareX, $predictionBottomSquareY, $white);
+                }
+                echo "Datei: $filename";
+                $handle = fopen($WNdataDir.$filename, "rb");
 
-                        $x = 0;
-                        $y = 1199;
-                        $highVal = 0;
-                        $lowVal = 0;
-                        $lastNoData=false;
-                        $currentNoData=false;
-                        $metaData=array();
+                $x = 0;
+                $y = 1199;
+                $highVal = 0;
+                $lowVal = 0;
+                $lastNoData=false;
+                $currentNoData=false;
+                $metaData=array();
 
-                        $metaData["produktkennung"] = fread($handle, 2);
-                        $metaData["messungUTC"] =  fread($handle, 6);
-                        $metaData["WMONummer"] =  intval(fread($handle, 5));
-                        $metaData["messungZeitpunkt"] =  fread($handle, 4);
-                        $metaData["kennungBY"] =  fread($handle, 2);
-                        $metaData["produktLaenge"] =  intval(fread($handle, 10));
-                        $metaData["kennungVS"] =  fread($handle, 2);
-                        $metaData["formatVersion"] =  intval(fread($handle, 2));
-                        $metaData["kennungSW"] =  fread($handle, 2);
-                        $metaData["SoftwareVersion"] =  fread($handle, 9);
-                        $metaData["kennungPR"] =  fread($handle, 2);
-                        $metaData["Genauigkeit"] =  fread($handle, 5);
-                        $metaData["kennungINT"] =  fread($handle, 3);
-                        $metaData["intervalldauer"] =  fread($handle, 4);
-                        $metaData["kennungGP"] =  fread($handle, 2);
-                        $metaData["anzahlPixel"] =  fread($handle, 9);
-                        $metaData["kennungVV"] =  fread($handle, 2);
-                        $metaData["Vorhersagezeitpunkt"] =  intval(fread($handle, 4));
-                        $metaData["kennungMF"] =  fread($handle, 2);
-                        $metaData["Modulflags"] =  fread($handle, 9);
-                        $metaData["kennungMS"] =  fread($handle, 2);
-                        $metaData["Textlaenge"] =  intval(fread($handle, 3));
-                        $metaData["Text"] =  fread($handle, $metaData["Textlaenge"]);
-                        $metaData["ende"] = ord(fread($handle, 1));
+                $metaData["produktkennung"] = fread($handle, 2);
+                $metaData["messungUTC"] =  fread($handle, 6);
+                $metaData["WMONummer"] =  intval(fread($handle, 5));
+                $metaData["messungZeitpunkt"] =  fread($handle, 4);
+                $metaData["kennungBY"] =  fread($handle, 2);
+                $metaData["produktLaenge"] =  intval(fread($handle, 10));
+                $metaData["kennungVS"] =  fread($handle, 2);
+                $metaData["formatVersion"] =  intval(fread($handle, 2));
+                $metaData["kennungSW"] =  fread($handle, 2);
+                $metaData["SoftwareVersion"] =  fread($handle, 9);
+                $metaData["kennungPR"] =  fread($handle, 2);
+                $metaData["Genauigkeit"] =  fread($handle, 5);
+                $metaData["kennungINT"] =  fread($handle, 3);
+                $metaData["intervalldauer"] =  fread($handle, 4);
+                $metaData["kennungGP"] =  fread($handle, 2);
+                $metaData["anzahlPixel"] =  fread($handle, 9);
+                $metaData["kennungVV"] =  fread($handle, 2);
+                $metaData["Vorhersagezeitpunkt"] =  intval(fread($handle, 4));
+                $metaData["kennungMF"] =  fread($handle, 2);
+                $metaData["Modulflags"] =  fread($handle, 9);
+                $metaData["kennungMS"] =  fread($handle, 2);
+                $metaData["Textlaenge"] =  intval(fread($handle, 3));
+                $metaData["Text"] =  fread($handle, $metaData["Textlaenge"]);
+                $metaData["ende"] = ord(fread($handle, 1));
 
-                        $components = preg_split("/x/", $metaData["anzahlPixel"]);
-                        $anzPixelX = intval($components[0]);
-                        $anzPixelY = intval($components[1]);
-                        $zeitpunkt = "20".substr($metaData["messungZeitpunkt"],2,2)."-".substr($metaData["messungZeitpunkt"],0,2)."-".
-                            substr($metaData["messungUTC"],0,2)." ".substr($metaData["messungUTC"],2,2).":".substr($metaData["messungUTC"],4,2).":00";
-                        $messungZeitpunkt = date_create ( $zeitpunkt, new DateTimeZone( '+0000' ));
-                        $timezone=date_default_timezone_get();
-                        $userTimezone = new DateTimeZone($timezone);
-                        $messungZeitpunkt->setTimezone($userTimezone);
-                        $vorhersageZeitpunkt = "";
-                        try {
-                            $vorhersageZeitpunkt = date_add($messungZeitpunkt, new DateInterval("PT" . $metaData["Vorhersagezeitpunkt"] . "M"));
-                        } catch (Exception $e) {
-                        }
+                $components = preg_split("/x/", $metaData["anzahlPixel"]);
+                $anzPixelX = intval($components[0]);
+                $anzPixelY = intval($components[1]);
+                $zeitpunkt = "20".substr($metaData["messungZeitpunkt"],2,2)."-".substr($metaData["messungZeitpunkt"],0,2)."-".
+                    substr($metaData["messungUTC"],0,2)." ".substr($metaData["messungUTC"],2,2).":".substr($metaData["messungUTC"],4,2).":00";
+                $messungZeitpunkt = date_create ( $zeitpunkt, new DateTimeZone( '+0000' ));
+                $timezone=date_default_timezone_get();
+                $userTimezone = new DateTimeZone($timezone);
+                $messungZeitpunkt->setTimezone($userTimezone);
+                $vorhersageZeitpunkt = "";
+                try {
+                    $vorhersageZeitpunkt = date_add($messungZeitpunkt, new DateInterval("PT" . $metaData["Vorhersagezeitpunkt"] . "M"));
+                } catch (Exception $e) {
+                }
 
-                        $dBZSum=0;
-                        $sumCount=0;
-                        if(!$first){
-                            if($predictionBottomSquareY < 1199){
-                                // Zeilen unterhalb des Vorsagebereichs ignorieren
-                                $ignoreFirst = (1199 - $predictionBottomSquareY) * 1100 * 2;
-                                fread($handle,$ignoreFirst);
-                                $y = $predictionBottomSquareY;
-                            }
-                        }
-                        while(!feof($handle) && ($first || ($y > $predictionTopSquareY))) {
-                            // erstes Bild oder unterhalb des Vorhersagebereichs
-                            if (!$first) {
-                                if ($x == 0 && $predictionLeftSquareX > 0) {
-                                    // Spalten links von Vorhersagebereich ignorieren
-                                    fread($handle, ($predictionLeftSquareX ) * 2);
-                                    $x = $predictionLeftSquareX; // + 1;
-                                } elseif ($x == $predictionRightSquareX && $predictionRightSquareX < 1099) {
-                                    // Spalten rechts von Vorhersagebereich ignorieren
-                                    fread($handle, (1099 - $predictionRightSquareX +1 ) * 2);
-                                    $x = 1100;
-                                }
-                            }
-                            if($x<1100){
-                                $lowVal = ord(fread($handle, 1));
-                                $highVal = ord(fread($handle, 1));
-                                //                echo("H:$highVal;L:$lowVal ");
-                                $dBZ = ($lowVal + $highVal * 256) / 20 - 32.5;
-                                $color = 0;
-                                // Verarbeitung
-                                if ($highVal == 41) {
-                                    $currentNoData = true;
-                                } else {
-                                    $currentNoData = false;
-                                    $color = $white;
-                                    foreach ($colMapping as $limit => $col) {
-                                        if ($dBZ >= $limit) {
-                                            $color = $col;
-                                            break;
-                                        }
-                                    }
-                                    if ($x >= $measureLeftSquareX && $x <= $measureRightSquareX && $y >= $measureTopSquareY && $y <= $measureBottomSquareY) {
-                                        foreach ($relPixel as $i => $pixel) {
-                                            if ($x == $pixel["x"] && $y == $pixel["y"]) {
-                                                echo(" x: $x, y: $y, dBZ: $dBZ , Faktor: " . ($measureRadius - $pixel["d"]) / $measureRadius);
-                                                if ($dBZ > 0) {
-                                                    $dBZSum += $dBZ * ($measureRadius - $pixel["d"]) / $measureRadius;
-                                                }
-                                                $sumCount = $sumCount + ($measureRadius - $pixel["d"]) / $measureRadius;
-                                            }
-                                        }
-                                    }
-                                }
-                                if ($currentNoData) {
-                                    if ($lastNoData) {
-                                        $color = $white;
-                                    } else {
-                                        $color = $pink;
-                                    }
-                                } else {
-                                    if ($lastNoData && $x > 0) {
-                                        imagesetpixel($im, $x - 1, $y, $pink);
-                                    }
-                                }
-                                $lastNoData = $currentNoData;
-                                imagesetpixel($im, $x, $y, $color);
-                                //echo($x." ");
-                                $x++;
-                            }
-                            if ($x == 1100) {
-                                $x = 0;
-                                $y--;
-                            }
-                        }
-                        fclose($handle);
-                        if($first) {
-                            // $im sichern (vor Beschriftung)
-                            imagecopy($imMerge, $im, 0, 0, 0, 0, 1100, 1200);
-                        }
-
-                        $avgdBZ=0;
-                        if($sumCount>0){
-                            $avgdBZ=$dBZSum/$sumCount;
-                        }
-                        $zeitpunktString = date_format($vorhersageZeitpunkt, "d.m.Y - H:i - ").number_format($avgdBZ, 2,".", null)." dBZ";
-                        print "$filename - $zeitpunktString\n";
-                        imagestring($im, 5, 80, 80, $zeitpunktString, $black);
-
-
-                        $color= $white;
-                        foreach($colMapping as $limit => $col){
-                            if($avgdBZ >= $limit){
-                                $color = $col;
-                                break;
-                            }
-                        }
-                        // aktueller Wert
-                        $i=sizeof($colMappingBackground);
-                        imagefilledrectangle($im, $lx, $ly+$i*$lh, $lx+$lw, $ly+$i*$lh+$lh, $color);
-                        imagerectangle($im, $lx, $ly+$i*$lh, $lx+$lw, $ly+$i*$lh+$lh, $black);
-                        $avgdBZString=number_format($avgdBZ, 1,".",null);
-                        if($avgdBZ<10){
-                            $avgdBZString=" ".$avgdBZString;
-                        }
-                        imagestring($im, 3, $lx+10 , $ly+$i*$lh+10, "dBZ: $avgdBZString", $black);
-                        imagecopymerge($im, $imBackground, 0, 0, 0, 0, 1100, 1200, 100);
-                        $imout= imagecrop($im, ['x' => 80, 'y' => 80, 'width' => 950, 'height' => 1100]);
-
-                        $outDir=$this->ReadAttributeString("ImageOutDirectory");
-
-                        imagepng($imout, "$outDir$filename.png");
-                        imagedestroy($im);
-                        imagedestroy($imout);
-                        $first=false;
+                $dBZSum=0;
+                $sumCount=0;
+                if(!$first){
+                    if($predictionBottomSquareY < 1199){
+                        // Zeilen unterhalb des Vorsagebereichs ignorieren
+                        $ignoreFirst = (1199 - $predictionBottomSquareY) * 1100 * 2;
+                        fread($handle,$ignoreFirst);
+                        $y = $predictionBottomSquareY;
                     }
                 }
-                imagedestroy($imBackground);
-                imagedestroy($imMerge);
+                while(!feof($handle) && ($first || ($y > $predictionTopSquareY))) {
+                    // erstes Bild oder unterhalb des Vorhersagebereichs
+                    if (!$first) {
+                        if ($x == 0 && $predictionLeftSquareX > 0) {
+                            // Spalten links von Vorhersagebereich ignorieren
+                            fread($handle, ($predictionLeftSquareX ) * 2);
+                            $x = $predictionLeftSquareX; // + 1;
+                        } elseif ($x == $predictionRightSquareX && $predictionRightSquareX < 1099) {
+                            // Spalten rechts von Vorhersagebereich ignorieren
+                            fread($handle, (1099 - $predictionRightSquareX +1 ) * 2);
+                            $x = 1100;
+                        }
+                    }
+                    if($x<1100){
+                        $lowVal = ord(fread($handle, 1));
+                        $highVal = ord(fread($handle, 1));
+                        //                echo("H:$highVal;L:$lowVal ");
+                        $dBZ = ($lowVal + $highVal * 256) / 20 - 32.5;
+                        $color = 0;
+                        // Verarbeitung
+                        if ($highVal == 41) {
+                            $currentNoData = true;
+                        } else {
+                            $currentNoData = false;
+                            $color = $white;
+                            foreach ($colMapping as $limit => $col) {
+                                if ($dBZ >= $limit) {
+                                    $color = $col;
+                                    break;
+                                }
+                            }
+                            if ($x >= $measureLeftSquareX && $x <= $measureRightSquareX && $y >= $measureTopSquareY && $y <= $measureBottomSquareY) {
+                                foreach ($relPixel as $i => $pixel) {
+                                    if ($x == $pixel["x"] && $y == $pixel["y"]) {
+                                        echo(" x: $x, y: $y, dBZ: $dBZ , Faktor: " . ($measureRadius - $pixel["d"]) / $measureRadius);
+                                        if ($dBZ > 0) {
+                                            $dBZSum += $dBZ * ($measureRadius - $pixel["d"]) / $measureRadius;
+                                        }
+                                        $sumCount = $sumCount + ($measureRadius - $pixel["d"]) / $measureRadius;
+                                    }
+                                }
+                            }
+                        }
+                        if ($currentNoData) {
+                            if ($lastNoData) {
+                                $color = $white;
+                            } else {
+                                $color = $pink;
+                            }
+                        } else {
+                            if ($lastNoData && $x > 0) {
+                                imagesetpixel($im, $x - 1, $y, $pink);
+                            }
+                        }
+                        $lastNoData = $currentNoData;
+                        imagesetpixel($im, $x, $y, $color);
+                        //echo($x." ");
+                        $x++;
+                    }
+                    if ($x == 1100) {
+                        $x = 0;
+                        $y--;
+                    }
+                }
+                fclose($handle);
+                if($first) {
+                    // $im sichern (vor Beschriftung)
+                    imagecopy($imMerge, $im, 0, 0, 0, 0, 1100, 1200);
+                }
 
+                $avgdBZ=0;
+                if($sumCount>0){
+                    $avgdBZ=$dBZSum/$sumCount;
+                }
+                $zeitpunktString = date_format($vorhersageZeitpunkt, "d.m.Y - H:i - ").number_format($avgdBZ, 2,".", null)." dBZ";
+                print "$filename - $zeitpunktString\n";
+                imagestring($im, 5, 80, 80, $zeitpunktString, $black);
+
+
+                $color= $white;
+                foreach($colMapping as $limit => $col){
+                    if($avgdBZ >= $limit){
+                        $color = $col;
+                        break;
+                    }
+                }
+                // aktueller Wert
+                $i=sizeof($colMappingBackground);
+                imagefilledrectangle($im, $lx, $ly+$i*$lh, $lx+$lw, $ly+$i*$lh+$lh, $color);
+                imagerectangle($im, $lx, $ly+$i*$lh, $lx+$lw, $ly+$i*$lh+$lh, $black);
+                $avgdBZString=number_format($avgdBZ, 1,".",null);
+                if($avgdBZ<10){
+                    $avgdBZString=" ".$avgdBZString;
+                }
+                imagestring($im, 3, $lx+10 , $ly+$i*$lh+10, "dBZ: $avgdBZString", $black);
+                imagecopymerge($im, $imBackground, 0, 0, 0, 0, 1100, 1200, 100);
+                $imout= imagecrop($im, ['x' => 80, 'y' => 80, 'width' => 950, 'height' => 1100]);
+
+                $outDir=$this->ReadAttributeString("ImageOutDirectory");
+
+                imagepng($imout, "$outDir$filename.png");
+                imagedestroy($im);
+                imagedestroy($imout);
+                $first=false;
+            }
         }
-	}
+        imagedestroy($imBackground);
+        imagedestroy($imMerge);
+    }
+}
