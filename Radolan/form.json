@@ -44,7 +44,7 @@
             "name": "Timeout",
             "type": "NumberSpinner",
             "caption": "Timeout"
-        },
+        }
 
     ],
     "status": []
