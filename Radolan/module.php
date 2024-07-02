@@ -152,12 +152,18 @@ class Radolan extends IPSModule
         $this->RegisterAttributeString("WNDataDirectory", "");
         $this->RegisterAttributeString("ImageOutDirectory", "");
         $this->RegisterAttributeString("colMappingBackground", "");
+        $this->RegisterAttributeString("relPixel", "");
 
 
         $this->RegisterAttributeInteger("predictionLeftSquareX", 0);
         $this->RegisterAttributeInteger("predictionRightSquareX", 0);
         $this->RegisterAttributeInteger("predictionTopSquareY", 0);
         $this->RegisterAttributeInteger("predictionBottomSquareY", 0);
+
+        $this->RegisterAttributeInteger("measureLeftSquareX", 0);
+        $this->RegisterAttributeInteger("measureRightSquareX", 0);
+        $this->RegisterAttributeInteger("measureTopSquareY", 0);
+        $this->RegisterAttributeInteger("measureBottomSquareY", 0);
 
     }
 
