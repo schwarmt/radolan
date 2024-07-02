@@ -1,10 +1,10 @@
 {
     "elements": [
-        { "type": "NumberSpinner", "name": "Latitude", "caption": "Latitude (N)", "digits": 2},
 
-        { "type": "ValidationTextBox", "name": "IP", "caption": "IP" },
-        { "type": "Label", "label": "Update interval" },
-        { "type": "IntervalBox", "name": "Period", "caption": "Seconds" }
+        { "type": "NumberSpinner", "name": "Latitude", "caption": "Latitude (N)", "digits": 6},
+        { "type": "NumberSpinner", "name": "Longitude", "caption": "Longitude (W)", "digits": 6},
+        { "type": "ValidationTextBox", "name": "Place", "caption": "Place" },
+        { "type": "NumberSpinner", "name": "Radius", "caption": "Radius"}
 
     ],
     "actions": [
@@ -19,33 +19,7 @@
             "type": "Button",
             "caption": "Process Radolan Data",
             "onClick": "RAD_ProcessRadolanData($id);"
-        },
-        {
-            "name": "Latitude (e.g. 48.762778)",
-            "type": "ValidationTextBox",
-            "caption": "geographical lat"
-        },
-        {
-            "name": "Longitude (e.g. 11.424722)",
-            "type": "ValidationTextBox",
-            "caption": "geographical lon"
-        },
-        {
-            "name": "Place (e.g. Ingolstadt)",
-            "type": "ValidationTextBox",
-            "caption": "Request Data"
-        },
-        {
-            "name": "Radius (e.g. 8)",
-            "type": "ValidationTextBox",
-            "caption": "Request Data"
-        },
-        {
-            "name": "Timeout",
-            "type": "NumberSpinner",
-            "caption": "Timeout"
         }
-
     ],
     "status": []
 }
