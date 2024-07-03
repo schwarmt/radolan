@@ -180,7 +180,9 @@ class Radolan extends IPSModule
     }
 
     function getDateTimeFromFileName($filename){
-        $res = DateTimeImmutable::createFromFormat("ymdHi", substr($filename, 2, 10));
+        $res = DateTime::createFromFormat("ymdHi", substr($filename, 2, 10),new DateTimeZone('UTC'));
+        $timezone = new DateTimeZone('Europe/Berlin');
+        $res->setTimezone($timezone);
         SetValue($this->GetIDForIdent("BaseTimeString"), $res->format('d.m.Y H:i:s'));
         SetValue($this->GetIDForIdent("BaseTime"), $res->getTimestamp());
     }
