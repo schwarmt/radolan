@@ -224,14 +224,14 @@ class Radolan extends IPSModule
 
     protected function SetImage($timeOffset, $filename)
     {
-        $MediaId = @$this->GetIDForIdent('IMAGE');
+        $MediaId = @$this->GetIDForIdent('IMAGE_'.$timeOffset);
         if ($MediaId == false) {
             $MediaId = IPS_CreateMedia(MEDIATYPE_IMAGE);
             IPS_SetParent($MediaId, $this->InstanceID);
-            IPS_SetName($MediaId, $this->Translate('Image'));
-            IPS_SetIdent($MediaId, 'IMAGE');
-            IPS_SetMediaFile($MediaId, $filename, true);
+            IPS_SetName($MediaId, "Bild " . $timeOffset);
+            IPS_SetIdent($MediaId, 'IMAGE_' . $timeOffset);
         }
+        IPS_SetMediaFile($MediaId, $filename, true);
         return $MediaId;
     }
 
