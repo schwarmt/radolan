@@ -181,45 +181,11 @@ class Radolan extends IPSModule
 
     function getDateTimeFromFileName($filename){
         $res = DateTimeImmutable::createFromFormat("ymdHi", substr($filename, 2, 10));
-        SetValue($this->GetIDForIdent("BaseTimeString"), $res->format('Y-m-d H:i:s'));
+        SetValue($this->GetIDForIdent("BaseTimeString"), $res->format('d.m.Y H:i:s'));
         SetValue($this->GetIDForIdent("BaseTime"), $res->getTimestamp());
     }
     function getOffsetFromFileName($filename){
         return substr($filename, 13,3);
-    }
-    public function UpdateImage()
-    {
-        $URL = $this->ImageURL;
-        if ($URL == false) {
-            return false;
-        }
-        if ($this->ParentID == 0) {
-            return false;
-        }
-        if (!$this->HasActiveParent()) {
-            return false;
-        }
-        $ch = curl_init();
-        curl_setopt($ch, CURLOPT_URL, $URL);
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-        curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 2);
-        curl_setopt($ch, CURLOPT_TIMEOUT_MS, 5000);
-        curl_setopt($ch, CURLOPT_HTTPAUTH, CURLAUTH_BASIC | CURLAUTH_DIGEST);
-        $this->SendDebug('Request Image', $URL, 0);
-        $Result = curl_exec($ch);
-        $http_code = curl_getinfo($ch, CURLINFO_RESPONSE_CODE);
-        $Error = curl_error($ch);
-        curl_close($ch);
-        if (($Result === false) || ($http_code >= 400)) {
-            $this->SendDebug('Request Image ' . $http_code, $Error, 0);
-            set_error_handler([$this, 'ModulErrorHandler']);
-            trigger_error($Error, E_USER_NOTICE);
-            restore_error_handler();
-            return false;
-        }
-        $MediaId = $this->GetMediaId();
-        IPS_SetMediaContent($MediaId, base64_encode($Result));
-        return true;
     }
 
     protected function SetImage($timeOffset, $filename)
@@ -242,7 +208,7 @@ class Radolan extends IPSModule
 
         //  /mnt/data/symcon/media/RAD_radolan
 
-        $localTempRadolanFolder = IPS_GetKernelDir().DIRECTORY_SEPARATOR."media".DIRECTORY_SEPARATOR."RAD_radolan".$this->InstanceID.DIRECTORY_SEPARATOR;
+        $localTempRadolanFolder = IPS_GetKernelDir().DIRECTORY_SEPARATOR."media".DIRECTORY_SEPARATOR."RAD_radolan".$this->InstanceID;
         if(!is_dir($localTempRadolanFolder)){
             mkdir($localTempRadolanFolder);
         }
@@ -274,20 +240,11 @@ class Radolan extends IPSModule
         file_put_contents( $full_file_name_bz2, file_get_contents($url));
         exec("bzip2 -d $full_file_name_bz2");
 
-        // Use file_get_contents() function to get the file
-        // from url and use file_put_contents() function to
-        // save the file by using base name
-        #if(file_put_contents( $full_file_name,bzdecompress ( file_get_contents($url), true ))) {
-        #    echo "File downloaded successfully";
-        #}
-        #else {
-        #    echo "File downloading failed.";
-        #}
         try {
             $phar = new PharData($full_file_name);
             $phar->extractTo($WNdataDir, null, true); // extract all files
         } catch (Exception $e) {
-            // handle errors
+            $this->SendDebug('Error extracting tar', $e->getTraceAsString(), 0);
         }
         // tar-file löschen
         unlink($full_file_name);
@@ -326,26 +283,6 @@ class Radolan extends IPSModule
         date_default_timezone_set ('Europe/Berlin' );
 
         $c=new RadolanComposite();
-
-        [$xx, $yy] = $c->translate(55.8621, 1.14445);
-        print "Top left: xx: $xx yy: $yy\n";
-
-        [$xx, $yy] = $c->translate(55.8448, 18.7583);
-        print "Top right: xx: $xx yy: $yy\n";
-
-        [$xx, $yy] = $c->translate(45.7004, 3.5571);
-        print "Bottom left: xx: $xx yy: $yy\n";
-
-        [$xx, $yy] = $c->translate(45.6882, 16.5967);
-        print "Bottom right: xx: $xx yy: $yy\n";
-
-        print "$measureName: Lat $measureLat, Lon $measureLon\n";
-
-        [$xx, $yy] = $c->translate($measureLat, $measureLon);
-        print "$measureName: xx: $xx yy: $yy\n";
-
-        [$xx, $yy] = $c->translateXYtoLatLon($xx, $yy);
-        print "Ingolstadt again: Lat: $xx Lon: $yy\n";
 
         $imBackground= $this->createEmptyImage();
         $colMappingBackground= $this->addColorsToImage($imBackground, $colors);
@@ -398,7 +335,6 @@ class Radolan extends IPSModule
             }
         }
         imageellipse($imBackground, $measureX, $measureY, $measureRadius*2, $measureRadius*2, $black);
-
 
         // Begrenzung Vorhersagebereich
         imagerectangle($imBackground, $predictionLeftSquareX-1, $predictionTopSquareY-1, $predictionRightSquareX+1, $predictionBottomSquareY+1, $black);
@@ -471,7 +407,6 @@ class Radolan extends IPSModule
 
         foreach(scandir ( $WNdataDir , SCANDIR_SORT_ASCENDING ) as $filename) {
             if($filename != "." && $filename != "..") {
-
                 $im= $this->createEmptyImage();
                 $colMapping= $this->addColorsToImage($im, $colors);
                 $black = imagecolorallocate($im, 0, 0, 0);
@@ -486,11 +421,17 @@ class Radolan extends IPSModule
                     imagecopymerge($im, $imMerge, 0, 0, 0, 0, 1100, 1200, 50);
                     imagefilledrectangle($im, $predictionLeftSquareX, $predictionTopSquareY, $predictionRightSquareX, $predictionBottomSquareY, $white);
                 }
-                echo "Datei: $filename";
+
                 if($first) {
                     $this->getDateTimeFromFileName($filename);
                 }
+
+                $this->SendDebug('Processing Image', $filename, 0);
+
                 $timeOffset=$this->getOffsetFromFileName($filename);
+
+                $outDir=$this->ReadAttributeString("ImageOutDirectory");
+                $imageOutFile = $outDir.$filename.".png";
 
                 $handle = fopen($WNdataDir.$filename, "rb");
 
@@ -540,6 +481,7 @@ class Radolan extends IPSModule
                 try {
                     $vorhersageZeitpunkt = date_add($messungZeitpunkt, new DateInterval("PT" . $metaData["Vorhersagezeitpunkt"] . "M"));
                 } catch (Exception $e) {
+                    $this->SendDebug('Error computing Vorhersagezeitpunkt', $e->getTraceAsString(), 0);
                 }
 
                 $dBZSum=0;
@@ -568,7 +510,6 @@ class Radolan extends IPSModule
                     if($x<1100){
                         $lowVal = ord(fread($handle, 1));
                         $highVal = ord(fread($handle, 1));
-                        //                echo("H:$highVal;L:$lowVal ");
                         $dBZ = ($lowVal + $highVal * 256) / 20 - 32.5;
                         $color = 0;
                         // Verarbeitung
@@ -586,7 +527,6 @@ class Radolan extends IPSModule
                             if ($x >= $measureLeftSquareX && $x <= $measureRightSquareX && $y >= $measureTopSquareY && $y <= $measureBottomSquareY) {
                                 foreach ($relPixel as $i => $pixel) {
                                     if ($x == $pixel["x"] && $y == $pixel["y"]) {
-                                        echo(" x: $x, y: $y, dBZ: $dBZ , Faktor: " . ($measureRadius - $pixel["d"]) / $measureRadius);
                                         if ($dBZ > 0) {
                                             $dBZSum += $dBZ * ($measureRadius - $pixel["d"]) / $measureRadius;
                                         }
@@ -608,7 +548,6 @@ class Radolan extends IPSModule
                         }
                         $lastNoData = $currentNoData;
                         imagesetpixel($im, $x, $y, $color);
-                        //echo($x." ");
                         $x++;
                     }
                     if ($x == 1100) {
@@ -629,9 +568,7 @@ class Radolan extends IPSModule
                 $zeitpunktString = date_format($vorhersageZeitpunkt, "d.m.Y - H:i - ").number_format($avgdBZ, 2,".", null)." dBZ";
 
                 SetValue($this->GetIDForIdent($timeOffset), $avgdBZ);
-                print "$filename - $zeitpunktString\n";
                 imagestring($im, 5, 80, 80, $zeitpunktString, $black);
-
 
                 $color= $white;
                 foreach($colMapping as $limit => $col){
@@ -652,11 +589,8 @@ class Radolan extends IPSModule
                 imagecopymerge($im, $imBackground, 0, 0, 0, 0, 1100, 1200, 100);
                 $imout= imagecrop($im, ['x' => 80, 'y' => 80, 'width' => 950, 'height' => 1100]);
 
-                $outDir=$this->ReadAttributeString("ImageOutDirectory");
-
-                imagepng($imout, "$outDir$filename.png");
-                $this->SetImage($timeOffset,"$outDir$filename.png");
-
+                imagepng($imout, $imageOutFile);
+                $this->SetImage($timeOffset,$imageOutFile);
 
                 imagedestroy($im);
                 imagedestroy($imout);
