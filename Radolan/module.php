@@ -169,7 +169,7 @@ class Radolan extends IPSModule
     }
 
     function getDateTimeFromFileName($filename){
-        $res = DateTimeImmutable::createFromFormat("yyDDMMHHMM", substr($filename, 2, 10));
+        $res = DateTimeImmutable::createFromFormat("ymdHi", substr($filename, 2, 10));
         SetValue($this->GetIDForIdent("BaseTimeString"), $res);
         SetValue($this->GetIDForIdent("BaseTime"), $res);
     }
