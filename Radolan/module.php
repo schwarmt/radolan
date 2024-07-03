@@ -126,6 +126,10 @@ class Radolan extends IPSModule
 
         $this->RegisterAttributeString("WNDataDirectory", "");
         $this->RegisterAttributeString("ImageOutDirectory", "");
+
+        $this->RegisterVariableString("BaseTimeString", "BaseTimeString", "");
+        $this->RegisterVariableInteger("BaseTime", "BaseTime", "~UnixTimestamp" );
+
     }
 
     public function Destroy()
@@ -162,6 +166,12 @@ class Radolan extends IPSModule
     function delTree($dir): bool {
         $this->delFolderContents($dir);
         return rmdir($dir);
+    }
+
+    function getDateTimeFromFileName($filename){
+        $res = DateTimeImmutable::createFromFormat("yyDDMMHHMM", substr($filename, 2, 10));
+        SetValue($this->GetIDForIdent("BaseTimeString"), $res);
+        SetValue($this->GetIDForIdent("BaseTime"), $res);
     }
 
     public function UpdateImage()
@@ -219,7 +229,7 @@ class Radolan extends IPSModule
 
         //  /mnt/data/symcon/media/RAD_radolan
 
-        $localTempRadolanFolder = IPS_GetKernelDir().DIRECTORY_SEPARATOR."media".DIRECTORY_SEPARATOR."RAD_radolan".DIRECTORY_SEPARATOR;
+        $localTempRadolanFolder = IPS_GetKernelDir().DIRECTORY_SEPARATOR."media".DIRECTORY_SEPARATOR."RAD_radolan".$this->InstanceID.DIRECTORY_SEPARATOR;
         if(!is_dir($localTempRadolanFolder)){
             mkdir($localTempRadolanFolder);
         }
@@ -464,6 +474,9 @@ class Radolan extends IPSModule
                     imagefilledrectangle($im, $predictionLeftSquareX, $predictionTopSquareY, $predictionRightSquareX, $predictionBottomSquareY, $white);
                 }
                 echo "Datei: $filename";
+
+                $this->getDateTimeFromFileName($filename);
+
                 $handle = fopen($WNdataDir.$filename, "rb");
 
                 $x = 0;
@@ -625,6 +638,9 @@ class Radolan extends IPSModule
                 $outDir=$this->ReadAttributeString("ImageOutDirectory");
 
                 imagepng($imout, "$outDir$filename.png");
+
+
+
                 imagedestroy($im);
                 imagedestroy($imout);
                 $first=false;
