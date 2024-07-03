@@ -221,7 +221,8 @@ class Radolan extends IPSModule
         IPS_SetMediaContent($MediaId, base64_encode($Result));
         return true;
     }
-    protected function GetMediaId()
+
+    protected function SetImage($timeOffset, $filename)
     {
         $MediaId = @$this->GetIDForIdent('IMAGE');
         if ($MediaId == false) {
@@ -229,8 +230,7 @@ class Radolan extends IPSModule
             IPS_SetParent($MediaId, $this->InstanceID);
             IPS_SetName($MediaId, $this->Translate('Image'));
             IPS_SetIdent($MediaId, 'IMAGE');
-            $filename = 'media' . DIRECTORY_SEPARATOR . 'ONVIF_' . $this->InstanceID . '.jpg';
-            IPS_SetMediaFile($MediaId, $filename, false);
+            IPS_SetMediaFile($MediaId, $filename, true);
         }
         return $MediaId;
     }
@@ -655,7 +655,7 @@ class Radolan extends IPSModule
                 $outDir=$this->ReadAttributeString("ImageOutDirectory");
 
                 imagepng($imout, "$outDir$filename.png");
-
+                $this->SetImage($timeOffset,"$outDir$filename.png");
 
 
                 imagedestroy($im);
