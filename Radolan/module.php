@@ -1,6 +1,8 @@
 <?php
 
 declare(strict_types=1);
+
+
 class RadolanComposite {
 
     public float $offx= 0 ; // horizontal projection offset
@@ -114,6 +116,10 @@ class RadolanComposite {
 
 class Radolan extends IPSModule
 {
+    const DB_IDENTS =['000', '005', '010', '015', '020', '025', '030', '035',
+        '040', '045', '050', '055', '060', '065', '070', '075',
+        '080', '085', '090', '095', '100', '105', '110', '115', '120'
+    ];
     public function Create()
     {
         //Never delete this line!
@@ -129,6 +135,11 @@ class Radolan extends IPSModule
 
         $this->RegisterVariableString("BaseTimeString", "BaseTimeString", "");
         $this->RegisterVariableInteger("BaseTime", "BaseTime", "~UnixTimestamp" );
+
+
+        foreach(self::DB_IDENTS as $currIdent){
+            $this->RegisterVariableFloat($currIdent, "Regenintensität ".$currIdent);
+        }
 
     }
 
@@ -173,7 +184,9 @@ class Radolan extends IPSModule
         SetValue($this->GetIDForIdent("BaseTimeString"), $res->format('Y-m-d H:i:s'));
         SetValue($this->GetIDForIdent("BaseTime"), $res->getTimestamp());
     }
-
+    function getOffsetFromFileName($filename){
+        return substr($filename, 13,3);
+    }
     public function UpdateImage()
     {
         $URL = $this->ImageURL;
@@ -474,8 +487,10 @@ class Radolan extends IPSModule
                     imagefilledrectangle($im, $predictionLeftSquareX, $predictionTopSquareY, $predictionRightSquareX, $predictionBottomSquareY, $white);
                 }
                 echo "Datei: $filename";
-
-                $this->getDateTimeFromFileName($filename);
+                if($first) {
+                    $this->getDateTimeFromFileName($filename);
+                }
+                $timeOffset=$this->getOffsetFromFileName($filename);
 
                 $handle = fopen($WNdataDir.$filename, "rb");
 
@@ -612,6 +627,8 @@ class Radolan extends IPSModule
                     $avgdBZ=$dBZSum/$sumCount;
                 }
                 $zeitpunktString = date_format($vorhersageZeitpunkt, "d.m.Y - H:i - ").number_format($avgdBZ, 2,".", null)." dBZ";
+
+                SetValue($this->GetIDForIdent($timeOffset), $avgdBZ);
                 print "$filename - $zeitpunktString\n";
                 imagestring($im, 5, 80, 80, $zeitpunktString, $black);
 
