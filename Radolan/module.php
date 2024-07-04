@@ -116,6 +116,10 @@ class RadolanComposite {
 
 class Radolan extends IPSModule
 {
+    const STATUS_ACTIVE = 102;
+    const STATUS_INACTIVE = 104;
+    const STATUS_ERROR = 200;
+
     const DB_IDENTS = ['000', '005', '010', '015', '020', '025', '030', '035',
         '040', '045', '050', '055', '060', '065', '070', '075',
         '080', '085', '090', '095', '100', '105', '110', '115', '120'
@@ -132,6 +136,9 @@ class Radolan extends IPSModule
         $this->RegisterPropertyFloat("Longitude", 11.424722);
         $this->RegisterPropertyInteger("Radius", 8);
         $this->RegisterPropertyString("Place", "Ingolstadt");
+        $this->RegisterPropertyBoolean("TimerActive", true);
+        $this->RegisterPropertyInteger('Period', 900);
+        $this->RegisterPropertyInteger('dBZRainMin', 2);
 
         $this->RegisterAttributeString("RadolanDirectory", "");
         $this->RegisterAttributeString("WNDataDirectory", "");
@@ -146,6 +153,11 @@ class Radolan extends IPSModule
         foreach (self::DB_IDENTS as $currIdent) {
             $this->RegisterVariableFloat($currIdent, "Regenintensität " . $currIdent);
         }
+        //Timer
+        $this->RegisterTimer('UpdateData', 0, 'RAD_UpdateData($_IPS[\'TARGET\']);');
+
+        $this->SetTimer(boolval(GetValueBoolean($this->GetIDForIdent('TimerActive'))));
+
 
     }
 
@@ -163,6 +175,8 @@ class Radolan extends IPSModule
     {
         //Never delete this line!
         parent::ApplyChanges();
+        $this->SetTimer(boolval(GetValueBoolean($this->GetIDForIdent('TimerActive'))));
+
     }
 
     function createEmptyImage()
@@ -193,6 +207,14 @@ class Radolan extends IPSModule
         $this->delFolderContents($dir);
         return rmdir($dir);
     }
+
+    function SetTimer($timerActive){
+        if ($timerActive == true) {
+            $this->SetTimerInterval('UpdateData', $this->ReadPropertyInteger('Period') * 1000);
+        } else {
+            $this->SetTimerInterval('UpdateData', 0);
+        }
+}
 
     function setBaseTimeFromFileName($filename)
     {
@@ -251,7 +273,8 @@ class Radolan extends IPSModule
     {
         $rainExpected=false;
         $maxdBZ = $this->maxdBZForTimestamp($fromTimestamp, $duration);
-        if ($maxdBZ >= self::DBZ_MIN_VALUE) {
+        $dBZRainMin=$this->$this->ReadPropertyInteger("dBZRainMin");
+        if (($maxdBZ >= $dBZRainMin) or($maxdBZ === -1)) {
             $rainExpected = true;
         }
         return $rainExpected;
@@ -269,8 +292,16 @@ class Radolan extends IPSModule
         return $MediaId;
     }
 
+    public function UpdateData(){
+        $this->SendDebug('UpdateData started');
+        $this->GetRadolanData();
+        $this->ProcessRadolanData();
+        $this->SendDebug('UpdateData ended');
+    }
+
     public function GetRadolanData()
     {
+        $this->SendDebug('GetRadolanData started');
 
         $url = 'https://opendata.dwd.de/weather/radar/composite/wn/WN_LATEST.tar.bz2';
         $file_name = 'WN_LATEST.tar';
@@ -317,10 +348,12 @@ class Radolan extends IPSModule
         }
         // tar-file löschen
         unlink($full_file_name);
+        $this->SendDebug('GetRadolanData ended');
     }
 
     public function ProcessRadolanData()
     {
+        $this->SendDebug('ProcessRadolanData started');
 
         include 'Borders.php';
         include 'Cities.php';
@@ -676,7 +709,8 @@ class Radolan extends IPSModule
         imagedestroy($imBackground);
         imagedestroy($imMerge);
         $this->storeCurrentAvgdBZ($avgdBZArray);
-        $this->SendDebug('Werte', var_export($avgdBZArray), 0);
+        $this->SendDebug('Werte', var_dump($avgdBZArray), 0);
+        $this->SendDebug('ProcessRadolanData started');
 
     }
 

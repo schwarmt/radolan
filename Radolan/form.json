@@ -4,7 +4,10 @@
         { "type": "NumberSpinner", "name": "Latitude", "caption": "Latitude (N)", "digits": 6},
         { "type": "NumberSpinner", "name": "Longitude", "caption": "Longitude (W)", "digits": 6},
         { "type": "ValidationTextBox", "name": "Place", "caption": "Place" },
-        { "type": "NumberSpinner", "name": "Radius", "caption": "Radius"}
+        { "type": "NumberSpinner", "name": "Radius", "caption": "Radius"},
+        { "type": "NumberSpinner", "name": "dBZRainMin", "caption": "dBZ min value for rain"},
+        { "type": "CheckBox", "name": "TimerActive", "caption": "Timer active"},
+        { "type": "IntervalBox", "name": "Period", "caption": "Seconds" }
 
     ],
     "actions": [
@@ -23,7 +26,7 @@
 
         { "type": "ValidationTextBox", "name": "Zeitpunkt", "caption": "Prüfzeitpunkt d.m.Y H:i:s" },
         { "type": "ValidationTextBox", "name": "Dauer", "caption": "Dauer" },
-        { "type": "Button", "name": "Vorhersage", "onClick": "RAD_CheckRain($id, $Zeitpunkt, $Dauer);" }
+        { "type": "Button", "label": "Vorhersage", "onClick": "RAD_CheckRain($id, $Zeitpunkt, $Dauer);" }
     ],
     "status": []
 }
