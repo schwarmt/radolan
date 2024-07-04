@@ -709,7 +709,7 @@ class Radolan extends IPSModule
         imagedestroy($imBackground);
         imagedestroy($imMerge);
         $this->storeCurrentAvgdBZ($avgdBZArray);
-        $this->SendDebug('Werte', var_dump($avgdBZArray), 0);
+        //$this->SendDebug('Werte', var_dump($avgdBZArray), 0);
         $this->SendDebug('ProcessRadolanData started');
 
     }
