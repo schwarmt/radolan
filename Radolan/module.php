@@ -121,7 +121,7 @@ class Radolan extends IPSModule
         '080', '085', '090', '095', '100', '105', '110', '115', '120'
     ];
 
-    const DBZ_MIN_VALUE = 2;
+    const DBZ_MIN_VALUE = 1;
 
     public function Create()
     {
