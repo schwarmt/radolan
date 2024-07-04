@@ -232,7 +232,7 @@ class Radolan extends IPSModule
     public function isRainExpected($fromTimestamp, $duration)
     {
         $toTimestamp = $fromTimestamp;
-        $toTimestamp->add(new DateInterval('PT' . $duration . 'M'));
+        $toTimestamp += $duration*60;
         $currValues = $this->getCurrentAvgdBZ();
         $found = false;
         $rainExpected = false;
