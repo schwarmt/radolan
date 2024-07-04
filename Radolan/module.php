@@ -196,7 +196,9 @@ class Radolan extends IPSModule
 
     function setBaseTimeFromFileName($filename)
     {
-        $res = $this->getTimestampFromFileName($filename);
+        $res = DateTime::createFromFormat("ymdHi", substr($filename, 2, 10), new DateTimeZone('UTC'));
+        $timezone = new DateTimeZone('Europe/Berlin');
+        $res->setTimezone($timezone);
         SetValue($this->GetIDForIdent("BaseTimeString"), $res->format('d.m.Y H:i:s'));
         SetValue($this->GetIDForIdent("BaseTime"), $res->getTimestamp());
     }
@@ -213,7 +215,7 @@ class Radolan extends IPSModule
         $res->setTimezone($timezone);
         $offset = $this->getOffsetFromFileName($filename);
         $res->add(new DateInterval('PT' . $offset . 'M'));
-        return $res;
+        return $res->getTimestamp();
     }
 
     function storeCurrentAvgdBZ($valueArray)
@@ -671,8 +673,8 @@ class Radolan extends IPSModule
 
     public function CheckRain($zeitpunkt, $dauer)
     {
-        $timestamp = DateTime::createFromFormat('d.m.Y H:i:s', $zeitpunkt);
-        $regen=isRainExpected($timestamp, $dauer);
+        $timestamp = (DateTime::createFromFormat('d.m.Y H:i:s', $zeitpunkt))->getTimestamp();
+        $regen=$this->isRainExpected($timestamp, $dauer);
         echo("Regen erwartet ab".($timestamp->format('d.m.Y H:i:s'))." für ".$dauer." Minuten: ".$regen);
     }
 }
