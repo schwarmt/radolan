@@ -229,24 +229,33 @@ class Radolan extends IPSModule
         return unserialize($currValues, ['allowed_classes' => false]);
     }
 
-    public function isRainExpected($fromTimestamp, $duration)
+    public function maxdBZForTimestamp($fromTimestamp, $duration)
     {
         $toTimestamp = $fromTimestamp;
         $toTimestamp += $duration*60;
         $currValues = $this->getCurrentAvgdBZ();
+        $maxdBZ=-1;
         $found = false;
-        $rainExpected = false;
         foreach ($currValues as $key => $value) {
             if ($key >= $fromTimestamp and $key <= $toTimestamp) {
                 $found = true;
-                if ($value >= self::DBZ_MIN_VALUE) {
-                    $rainExpected = true;
+                if($value > $maxdbZ){
+                    $maxdBZ = $value;
                 }
             }
         }
-        return $rainExpected;
+        return $maxdBZ;
     }
 
+    public function isRainExpected($fromTimestamp, $duration)
+    {
+        $rainExpected=false;
+        $maxdBZ = $this->maxdBZForTimestamp($fromTimestamp, $duration);
+        if ($maxdBZ >= self::DBZ_MIN_VALUE) {
+            $rainExpected = true;
+        }
+        return $rainExpected;
+    }
     protected function SetImage($timeOffset, $filename)
     {
         $MediaId = @$this->GetIDForIdent('IMAGE_' . $timeOffset);
@@ -674,8 +683,9 @@ class Radolan extends IPSModule
     public function CheckRain($zeitpunkt, $dauer)
     {
         $timestamp = (DateTime::createFromFormat('d.m.Y H:i:s', $zeitpunkt))->getTimestamp();
+        $max=$this->maxdBZForTimestamp($timestamp,$dauer);
         $regen=$this->isRainExpected($timestamp, $dauer);
         $dt = new DateTime('@' . $timestamp);
-        echo("Regen erwartet ab".($dt->format('d.m.Y H:i:s'))." für ".$dauer." Minuten: ".$regen);
+        echo("Regen erwartet ab".($dt->format('d.m.Y H:i:s'))." für ".$dauer." Minuten: dBZ: ".$max." - Regen: ".($regen ? 'true' : 'false'));
     }
 }
