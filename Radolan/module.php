@@ -271,7 +271,7 @@ class Radolan extends IPSModule
     {
         $rainExpected=false;
         $maxdBZ = $this->maxdBZForTimestamp($fromTimestamp, $duration);
-        $dBZRainMin=$this->$this->ReadPropertyInteger("dBZRainMin");
+        $dBZRainMin=$this->ReadPropertyInteger("dBZRainMin");
         if (($maxdBZ >= $dBZRainMin) or($maxdBZ === -1)) {
             $rainExpected = true;
         }
