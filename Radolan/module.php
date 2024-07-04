@@ -487,7 +487,7 @@ class Radolan extends IPSModule
                     $this->setBaseTimeFromFileName($filename);
                 }
 
-                $currentTime = getTimestampFromFileName($filename);
+                $currentTime = $this->getTimestampFromFileName($filename);
 
                 $this->SendDebug('Processing Image', $filename, 0);
 
@@ -665,6 +665,7 @@ class Radolan extends IPSModule
         imagedestroy($imBackground);
         imagedestroy($imMerge);
         $this->storeCurrentAvgdBZ($avgdBZArray);
+        $this->SendDebug('Werte', var_export($avgdBZArray), 0);
 
     }
 
