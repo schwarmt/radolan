@@ -175,7 +175,7 @@ class Radolan extends IPSModule
     {
         //Never delete this line!
         parent::ApplyChanges();
-        $this->SetTimer(boolval(GetValueBoolean($this->GetIDForIdent('TimerActive'))));
+        //$this->SetTimer(boolval(GetValueBoolean($this->GetIDForIdent('TimerActive'))));
 
     }
 
