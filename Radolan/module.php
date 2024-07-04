@@ -299,7 +299,7 @@ class Radolan extends IPSModule
 
     public function GetRadolanData()
     {
-        $this->SendDebug('GetRadolanData started');
+        $this->SendDebug('GetRadolanData started',"",0);
 
         $url = 'https://opendata.dwd.de/weather/radar/composite/wn/WN_LATEST.tar.bz2';
         $file_name = 'WN_LATEST.tar';
@@ -346,12 +346,12 @@ class Radolan extends IPSModule
         }
         // tar-file löschen
         unlink($full_file_name);
-        $this->SendDebug('GetRadolanData ended');
+        $this->SendDebug('GetRadolanData ended',"",0);
     }
 
     public function ProcessRadolanData()
     {
-        $this->SendDebug('ProcessRadolanData started');
+        $this->SendDebug('ProcessRadolanData started',"",0);
 
         include 'Borders.php';
         include 'Cities.php';
@@ -708,7 +708,7 @@ class Radolan extends IPSModule
         imagedestroy($imMerge);
         $this->storeCurrentAvgdBZ($avgdBZArray);
         //$this->SendDebug('Werte', var_dump($avgdBZArray), 0);
-        $this->SendDebug('ProcessRadolanData started');
+        $this->SendDebug('ProcessRadolanData started',"",0);
 
     }
 
