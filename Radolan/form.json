@@ -19,7 +19,11 @@
             "type": "Button",
             "caption": "Process Radolan Data",
             "onClick": "RAD_ProcessRadolanData($id);"
-        }
+        },
+
+        { "type": "ValidationTextBox", "name": "Zeitpunkt", "caption": "Prüfzeitpunkt d.m.Y H:i:s" },
+        { "type": "ValidationTextBox", "name": "Dauer", "caption": "Dauer" },
+        { "type": "Button", "label": "Vorhersage", "onClick": "RAD_CheckRain($id, $Zeitpunkt, $Dauer" }
     ],
     "status": []
 }
