@@ -212,7 +212,9 @@ class Radolan extends IPSModule
         } else {
             $this->SetTimerInterval('UpdateData', 0);
         }
-}
+        $this->SendDebug('Set Timer', ($timerActive ? 'true' : 'false'),0);
+
+    }
 
     function setBaseTimeFromFileName($filename)
     {
@@ -708,7 +710,7 @@ class Radolan extends IPSModule
         imagedestroy($imMerge);
         $this->storeCurrentAvgdBZ($avgdBZArray);
         //$this->SendDebug('Werte', var_dump($avgdBZArray), 0);
-        $this->SendDebug('ProcessRadolanData started',"",0);
+        $this->SendDebug('ProcessRadolanData ended',"",0);
 
     }
 
