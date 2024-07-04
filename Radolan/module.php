@@ -239,7 +239,7 @@ class Radolan extends IPSModule
         foreach ($currValues as $key => $value) {
             if ($key >= $fromTimestamp and $key <= $toTimestamp) {
                 $found = true;
-                if($value > $maxdbZ){
+                if($value > $maxdBZ){
                     $maxdBZ = $value;
                 }
             }
