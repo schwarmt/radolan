@@ -675,6 +675,7 @@ class Radolan extends IPSModule
     {
         $timestamp = (DateTime::createFromFormat('d.m.Y H:i:s', $zeitpunkt))->getTimestamp();
         $regen=$this->isRainExpected($timestamp, $dauer);
-        echo("Regen erwartet ab".($timestamp->format('d.m.Y H:i:s'))." für ".$dauer." Minuten: ".$regen);
+        $dt = new DateTime('@' . $timestamp);
+        echo("Regen erwartet ab".($dt->format('d.m.Y H:i:s'))." für ".$dauer." Minuten: ".$regen);
     }
 }
