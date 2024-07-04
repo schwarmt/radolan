@@ -163,7 +163,7 @@ class Radolan extends IPSModule
     {
         $radolanDirectory = $this->ReadAttributeString("RadolanDirectory");
         if ($radolanDirectory !== "") {
-            delTree($radolanDirectory);
+            $this->delTree($radolanDirectory);
         }
         //Never delete this line!
         parent::Destroy();
