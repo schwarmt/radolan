@@ -156,9 +156,7 @@ class Radolan extends IPSModule
         //Timer
         $this->RegisterTimer('UpdateData', 0, 'RAD_UpdateData($_IPS[\'TARGET\']);');
 
-        //$this->SetTimer(boolval(GetValueBoolean($this->GetIDForIdent('TimerActive'))));
-
-
+        $this->SetTimer($this->ReadPropertyBoolean("TimerActive"));
     }
 
     public function Destroy()
@@ -175,7 +173,7 @@ class Radolan extends IPSModule
     {
         //Never delete this line!
         parent::ApplyChanges();
-        //$this->SetTimer(boolval(GetValueBoolean($this->GetIDForIdent('TimerActive'))));
+        $this->SetTimer($this->ReadPropertyBoolean("TimerActive"));
 
     }
 
