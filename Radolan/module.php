@@ -686,6 +686,8 @@ class Radolan extends IPSModule
         $max=$this->maxdBZForTimestamp($timestamp,$dauer);
         $regen=$this->isRainExpected($timestamp, $dauer);
         $dt = new DateTime('@' . $timestamp);
+        $timezone = new DateTimeZone('Europe/Berlin');
+        $dt->setTimezone($timezone);
         echo("Regen erwartet ab".($dt->format('d.m.Y H:i:s'))." für ".$dauer." Minuten: dBZ: ".$max." - Regen: ".($regen ? 'true' : 'false'));
     }
 }
