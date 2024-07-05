@@ -207,10 +207,13 @@ class Radolan extends IPSModule
     }
 
     function SetTimer($timerActive){
-        if ($timerActive == true) {
+        if ($timerActive === true) {
             $this->SetTimerInterval('UpdateData', $this->ReadPropertyInteger('Period') * 1000);
+            $this->SendDebug('Timer auf aktiv gesetzt', "",0);
+
         } else {
             $this->SetTimerInterval('UpdateData', 0);
+            $this->SendDebug('Timer auf inaktiv gesetzt', "",0);
         }
         $this->SendDebug('Set Timer', ($timerActive ? 'true' : 'false'),0);
 
@@ -293,10 +296,10 @@ class Radolan extends IPSModule
     }
 
     public function UpdateData(){
-        $this->SendDebug('UpdateData started');
+        $this->SendDebug('UpdateData started',"",0);
         $this->GetRadolanData();
         $this->ProcessRadolanData();
-        $this->SendDebug('UpdateData ended');
+        $this->SendDebug('UpdateData ended',"",0);
     }
 
     public function GetRadolanData()
@@ -714,11 +717,11 @@ class Radolan extends IPSModule
 
     }
 
-    public function CheckRain($zeitpunkt, $dauer)
+    public function CheckRain(string $zeitpunkt, string $dauer)
     {
         $timestamp = (DateTime::createFromFormat('d.m.Y H:i:s', $zeitpunkt))->getTimestamp();
-        $max=$this->maxdBZForTimestamp($timestamp,$dauer);
-        $regen=$this->isRainExpected($timestamp, $dauer);
+        $max=$this->maxdBZForTimestamp($timestamp,(int)$dauer);
+        $regen=$this->isRainExpected($timestamp, (int)$dauer);
         $dt = new DateTime('@' . $timestamp);
         $timezone = new DateTimeZone('Europe/Berlin');
         $dt->setTimezone($timezone);
